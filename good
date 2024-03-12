@@ -1,0 +1,29 @@
+import requests
+
+url = 'https://api.github.com/search/repositories'
+params = {
+    'q': 'stars:>1000',
+    'sort': 'stars',
+    'order': 'desc'
+}
+response = requests.get(url, params=params)
+data = response.json()
+
+for index, item in enumerate(data['items'][:5], start=1):
+    repo_name = item['name']
+    repo_url = item['html_url']
+    stars = item['stargazers_count']
+    
+    contributors_url = f"{item['url']}/contributors"
+    contributors_response = requests.get(contributors_url)
+    contributors_data = contributors_response.json()
+    contributors_count = len(contributors_data)
+
+    languages_url = f"{item['url']}/languages"
+    languages_response = requests.get(languages_url)
+    languages_data = languages_response.json()
+    languages = ', '.join(languages_data.keys())
+
+    print(f"{index}. {repo_name} - {repo_url}")
+    print(f"   Stars: {stars}, Contributors: {contributors_count}")
+    print(f"   Languages: {languages}\n")
